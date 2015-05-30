@@ -7,7 +7,6 @@ from matplotlib import animation
 
 
 colors = ['salmon','darkgreen','cornflowerblue','gold',  'seagreen',  'mediumvioletred', 'crimson', 'firebrick', 'indigo', 'navy','orangered',   'purple' ]
-
 class Plan(Talker):
     def __init__(self, semester='2015B', observatory='LCO', maxairmass=2.5, maxsun=-12.0, directory='/Users/zkbt/Dropbox/proposals/observability/', name='default'):
         Talker.__init__(self)
@@ -86,7 +85,7 @@ class Plan(Talker):
         for p in self.planets:
             p.speak(p.name)
             for t in p.transits:
-                t.speak('  {0} to {1} UT, ({2:.1f} hr)'.format(t.pretransit.iso.split('.')[0], t.posttransit.iso.split('.')[0], (t.posttransit - t.pretransit).value*24))
+                t.speak('  {0.iso} to {1.iso}'.format(t.ingress, t.egress))
 
     def plotTransits(self):
         self.findTransits()

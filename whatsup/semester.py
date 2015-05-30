@@ -8,13 +8,21 @@ class Semester(Talker):
         The start of the semester ()
 
     """
-    def __init__(self, name='2015b', plan=None):
+    def __init__(self, name='2015B', start=None, finish=None, plan=None):
         Talker.__init__(self)
         self.plan = plan
         self.name = name
-        if name == '2015B':
-            start='2015-07-01'
-            finish='2016-01-15'
+
+        if start is not None and finish is not None:
+            self.name = '{0}to{1}'.format(start, finish)
+        else:
+            if name == '2015B':
+                start='2015-07-01'
+                finish='2016-01-15'
+
+            if name == '2014B':
+                start='2014-07-01'
+                finish='2015-01-15'
 
         self.start, self.finish = astropy.time.Time([start, finish])
         self.midnights = astropy.time.Time(np.arange(self.start.jd, self.finish.jd), format='jd') + self.plan.observatory.standardzone

@@ -21,7 +21,27 @@ for k in reflection:
     k['transit_epoch'] += k['period']/2.0 # assuming e=0!
 
 
-joined = astropy.table.vstack([transmission, reflection])
+#joined = astropy.table.vstack([transmission, reflection])
+list = []
+list.append(transmission[np.array(
+            ['GJ1214' in name for name in transmission['name']])])
+list.append(transmission[np.array(
+            ['WASP80' in name for name in transmission['name']])])
+list.append(transmission[np.array(
+            ['WASP94' in name for name in transmission['name']])])
+list.append(transmission[np.array(
+            ['HD189733' in name for name in transmission['name']])])
+list.append(transmission[np.array(
+            ['HD209458' in name for name in transmission['name']])])
+list.append(reflection[np.array(
+            ['WASP103' in name for name in reflection['name']])])
+list.append(reflection[np.array(
+            ['WASP18' in name for name in reflection['name']])])
+#list.append(reflection[np.array(
+#            ['WASP103' in name for name in reflection['name']])])
+
+joined = astropy.table.vstack(list)
+
 p.selectInteresting(table=joined)
 p.findTransits()
 p.printTransits()
