@@ -66,6 +66,7 @@ class Observatory(Talker):
         self.plan = plan
 
     def plotSun(self, times, ax=None, threshold=-12.0, color='black'):
+        self.speak('plotting the sun')
         sunAltAz = self.sun(times)
 
         dt = times[1:] - times[:-1]
@@ -76,8 +77,12 @@ class Observatory(Talker):
         starts = nudged[sunrises]
         finishes = nudged[sunsets]
         maxlength = min(len(starts), len(finishes))
-        starts, finishes = starts[:maxlength], finishes[:maxlength]
+        if starts[0] > finishes[0]:
+            starts, finishes = starts[:maxlength-1], finishes[1:maxlength]
+        else:
+            starts, finishes = starts[:maxlength], finishes[:maxlength]
 
+        assert((finishes > starts).all())
         for i in range(len(starts)):
             ax.axvspan(starts[i].plot_date, finishes[i].plot_date, color=color, zorder=100)
 
@@ -92,7 +97,7 @@ class Observatory(Talker):
         return coord.transform_to(frame)
 
     def plotAirmass(self, coord, times,  **kwargs):
-
+        self.speak('plotting airmass')
         # calculate altaz
         altaz = self.altaz(coord, times)
         airmass = altaz.secz.value

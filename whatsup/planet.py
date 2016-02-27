@@ -35,7 +35,9 @@ class Planet(Interesting):
         self.speak('excluding transits above airmass={0} or outside {1} twilight'.format(self.plan.maxairmass, self.plan.maxsun))
         ingresses = astropy.time.Time([t.ingress for t in self.transits])
         egresses = astropy.time.Time([t.egress for t in self.transits])
-
+        #for i, t in enumerate(self.transits):
+        #    t.airmasses = []
+        #    t.sunalt = []
 
         # start off assuming all transits are good
         ok = np.ones(len(self.transits)).astype(np.bool)
@@ -45,15 +47,21 @@ class Planet(Interesting):
             altaz = self.plan.observatory.altaz(self.coord, times)
             ok *= altaz.alt.deg > 0
             ok *= altaz.secz < self.plan.maxairmass
+            #for i,t in enumerate(self.transits):
+            #    t.airmasses.append(altaz.secz[i])
+
 
         # filter out the transits that start or end when the Sun is up
         for times in [ingresses, egresses]:
             sunaltaz = self.plan.observatory.sun(times)
             ok *= sunaltaz.alt.deg < self.plan.maxsun
+            #for i,t in enumerate(self.transits):
+            #    t.sunalt.append(sunaltaz.alt.deg[i])
 
         self.transits = self.transits[ok]
         self.speak('filtered to {0} transits'.format(len(self.transits)))
 
     def plotTransits(self, **kw):
+        kw['zorder'] = -self.stellar_distance
         for t in self.transits:
             t.plot(**kw)
