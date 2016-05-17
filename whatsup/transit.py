@@ -1,5 +1,5 @@
 from imports import *
-buffer = 1.0
+buffer = 3.0
 
 class Transit(Talker):
     def __init__(self, planet, i, phasefrommidtransit=0.0, plan=None):
@@ -53,7 +53,7 @@ class Transit(Talker):
         print self.planet.name, [self.pretransit.plot_date, self.posttransit.plot_date], [y,y]
 
         # plot the airmass
-        times = self.pretransit + np.linspace(0, (buffer*2 + 1)*self.duration, 100)
+        times = self.pretransit + np.linspace(0, (buffer*2 + 1), 100)*self.duration
         altaz = self.plan.observatory.altaz(self.planet.coord, times)
         airmass = altaz.secz.value
         ok = altaz.alt > 0
@@ -63,7 +63,7 @@ class Transit(Talker):
         self.plan.ax['airmass'].plot(times.plot_date[ok], airmass[ok], **kwargs)
         self.plan.ax['airmass'].plot(times.plot_date[ok*intransit], airmass[ok*intransit], **kwargs)
 
-        self.plan.ax['transits'].text( self.midtransit.plot_date, y, self.planet.name, color=self.planet.color, ha='center', va='center', weight='bold', alpha=kwargs['alpha'])
+        self.plan.ax['transits'].text( self.midtransit.plot_date, y, self.planet.name, color=self.planet.color, ha='center', va='center', weight='bold', alpha=kwargs['alpha'], fontsize=8)
 
         #self.plan.ax['airmass'].set_ylim(self.plan.maxairmass, 0.9)
         self.plan.ax['airmass'].set_ylim(3, 0.9)

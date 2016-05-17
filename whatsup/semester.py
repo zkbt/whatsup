@@ -30,7 +30,7 @@ class Semester(Talker):
                 start='2014-07-01'
                 finish='2015-01-15'
 
-        self.start, self.finish = astropy.time.Time([start, finish])
+        self.start, self.finish = astropy.time.Time(start + ' 00:00:00.000', format='iso'), astropy.time.Time(finish + ' 00:00:00.000', format='iso')
         self.midnights = astropy.time.Time(np.arange(self.start.jd, self.finish.jd), format='jd') + self.plan.observatory.standardzone
         resolution = 10*astropy.units.minute
         n = (self.finish - self.start + 2*astropy.units.day)/resolution

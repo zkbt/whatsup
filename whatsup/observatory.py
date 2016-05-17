@@ -38,6 +38,19 @@ observatories['FLWO'] = \
 		elev = 500.0*astropy.units.m, # /* approximate elevation above horizon mtns */
 	)
 
+observatories['APO'] = \
+    dict(name="Apache Point Observatory",
+		timezone="Mountain",
+		standardzone = 7.0*astropy.units.hour,
+        usedaylightsaving = 0,
+		longitude = 105*astropy.units.deg,
+		latitude = 32*astropy.units.deg,
+		elevsea = 2798.0*astropy.units.m,
+		elev = 500.0*astropy.units.m, # /* approximate elevation above horizon mtns */
+	)
+
+
+
 class Observatory(Talker):
     """
     The Observatory object, for keeping track of timing calculating alt-az.

@@ -6,8 +6,17 @@ from exopop.Confirmed import Confirmed
 from planet import Planet
 from matplotlib import animation
 
-
-colors = ['salmon','darkgreen','cornflowerblue','gold',  'seagreen',  'mediumvioletred', 'crimson', 'firebrick', 'indigo', 'navy','orangered',   'purple' ]
+colors = [  'salmon',
+            'mediumvioletred',
+            'darkorange',
+            'plum',
+            'darkviolet',
+            'indigo',
+            'seagreen',
+            'darkgreen',
+            'teal',
+            'steelblue',
+            'royalblue']
 
 class Plan(Talker):
     def __init__(self, semester='2015B', observatory='LCO', maxairmass=5, maxsun=10.0, directory='/Users/zkbt/Dropbox/proposals/observability/', name='default', start=None, finish=None):
@@ -125,7 +134,7 @@ class Plan(Talker):
             self.planets[i].plotTransits(y=i)
 
         self.ax['transits'].set_xlim(self.semester.start.plot_date, self.semester.finish.plot_date)
-        self.ax['transits'].set_ylim(-1, len(self.planets))
+        self.ax['transits'].set_ylim(-0.1*len(self.planets), 1.2*len(self.planets))
 
         for k in self.ax.keys():
             self.observatory.plotSun(times=self.semester.times, ax=self.ax[k])
