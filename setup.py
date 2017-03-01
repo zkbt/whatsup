@@ -4,7 +4,6 @@
 # stolen shamelessly by zkbt from examples in dfm's and timothydmorton's github repos
 
 import os, sys, numpy, glob
-from Cython.Build import cythonize
 
 
 # import setup functions
@@ -37,7 +36,6 @@ setup(
     packages=[
         "whatsup"
     ],
-    #ext_modules=cythonize(exts),
     scripts=[g.strip('.py') for g in glob.glob('scripts/*.py')],
     url="http://github.com/zkbt/whatsup",
     license="MIT",

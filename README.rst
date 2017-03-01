@@ -3,9 +3,6 @@ whatsup
 
 Tools for planning observing runs that will be full of transiting planets.
 
-License
--------
+Very much so still under development. Try installing with `python setup.py install`.
 
-Copyright 2015 Zach Berta-Thompson
-
-Licensed under the terms of the MIT License (see LICENSE).
+Requires [exopop](https://github.com/zkbt/exopop).
