@@ -3,7 +3,7 @@ from whatsup.imports import *
 import numpy as np
 from exopop.Confirmed import Confirmed
 
-p = plan.Plan(semester='2016A',  start='2016-05-02', finish='2016-05-06', maxairmass=2.5, maxsun=-6.0)
+p = plan.Plan(observatory='APO', semester='OPEN',  start='2016-11-05', finish='2016-11-15', maxairmass=2.5, maxsun=-6.0)
 p.known = Confirmed()
 
 col = p.known.standard['name'].astype('S20')

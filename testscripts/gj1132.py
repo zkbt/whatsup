@@ -3,7 +3,7 @@ from whatsup.imports import *
 import numpy as np
 from exopop.Confirmed import Confirmed
 
-p = plan.Plan(semester='2016A',  start='2016-04-16', finish='2016-05-24', maxairmass=2.5, maxsun=-6.0)
+p = plan.Plan(semester='2016A',  start='2016-12-20', finish='2016-12-30', maxairmass=2.5, maxsun=-6.0)
 p.known = Confirmed()
 
 distance = 100.0

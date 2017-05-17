@@ -50,6 +50,18 @@ observatories['APO'] = \
 	)
 
 
+observatories['SBO'] = \
+    dict(name="Sommers-Bausch Observatory",
+		timezone="Mountain",
+		standardzone = 7.0*astropy.units.hour,
+        usedaylightsaving = 0,
+		longitude = 105.2635*astropy.units.deg,
+		latitude = 40.00372*astropy.units.deg,
+		elevsea = 1653.0*astropy.units.m,
+		elev = 500.0*astropy.units.m, # /* approximate elevation above horizon mtns */
+	)
+
+
 
 class Observatory(Talker):
     """
