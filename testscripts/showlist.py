@@ -1,3 +1,5 @@
+'''example script to show a list of interesting transits'''
+
 import whatsup.plan as plan
 p = plan.Plan()
 list = [n.strip() for n in open('interesting.list', 'rU').readlines()]

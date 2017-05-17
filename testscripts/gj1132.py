@@ -1,3 +1,5 @@
+'''example script to show one particular transiting planet'''
+
 import whatsup.plan as plan
 from whatsup.imports import *
 import numpy as np

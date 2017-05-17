@@ -1,3 +1,5 @@
+'''example script to show a list of interesting transits'''
+
 import whatsup.plan as plan
 from whatsup.imports import *
 import numpy as np
