@@ -3,7 +3,7 @@ from whatsup.imports import *
 import numpy as np
 from exopop.Confirmed import Confirmed
 
-p = plan.Plan(observatory='APO', semester='2017A',  start='2017-01-01', finish='2017-04-30', maxairmass=2.5, maxsun=-6.0)
+p = plan.Plan(observatory='APO', semester='2017-Q3',  start='2016-07-01', finish='2016-09-30', maxairmass=2.5, maxsun=-6.0)
 p.known = Confirmed()
 
 col = p.known.standard['name'].astype('S20')
@@ -41,4 +41,4 @@ p.selectInteresting(table=combined)
 p.findTransits()
 #p.printTransits()
 p.plotTransits()
-p.movie(filename='apo_spring.mp4')
+p.movie(filename='apo_summer.mp4')
