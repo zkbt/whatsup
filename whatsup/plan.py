@@ -6,6 +6,7 @@ from exopop.Confirmed import Confirmed
 from planet import Planet
 from matplotlib import animation
 
+# a list of colors to give transits (will repeat)
 colors = [  'salmon',
             'mediumvioletred',
             'darkorange',
@@ -19,50 +20,93 @@ colors = [  'salmon',
             'royalblue']
 
 class Plan(Talker):
-    def __init__(self, semester='2015B', observatory='LCO', maxairmass=5, maxsun=10.0, directory='/Users/zkbt/Dropbox/proposals/observability/', name='default', start=None, finish=None):
+    '''a Plan object to keep track of potentially observable transits'''
+
+    def __init__(self,
+                    semester='2015B',
+                    observatory='LCO',
+                    maxairmass=5,
+                    maxsun=10.0,
+                    directory='/Users/zkbt/Dropbox/proposals/observability/',
+                    name='default',
+                    start=None,
+                    finish=None):
+
+        '''initialize, setting the observatory, semester, and population'''
+
+        # initialize the talking setup
         Talker.__init__(self)
+
+        # set the maximum airmass and the maximum sun altitude
         self.maxairmass = maxairmass
         self.maxsun = maxsun
+
+        # set up a directory to store results in
         self.directory = directory
         zachopy.utils.mkdir(self.directory)
-        # set up which semester we're talking about
 
         # set up our observatory
         self.observatory = Observatory(observatory, plan=self)
 
+        # set up the time range this should cover
         self.semester = Semester(semester, plan=self, start=start, finish=finish)
 
+        # load the population of planets
         self.loadPopulation()
         self.selectInteresting()
 
-    def clean(self, s):
-        return s.replace(' ','').replace('-','')
+        # print out a summary of this plan
+        self.describeInputs()
 
-    def loadPopulation(self):
+    def describeInputs(self):
+        '''print text to terminal describing this observing plan'''
+
+        self.speak('Observatory is {}'.format(self.observatory))
+        self.speak('Time range spans {} to {}'.format(self.semester.start, self.semester.finish))
+        self.speak('Population contains {} objects'.format(len(self.known.standard)))
+
+    def loadPopulation(self, pop=Confirmed):
+        '''load a population of exoplanets, defaulting to the list
+        of confirmed transiting planets from the NASA Exoplanet Archive'''
+
         # set up the population
-        self.known = Confirmed()
-        '''self.known.standard.add_row(dict(name='WASP-94A b',
-                        period=3.9501907, transit_epoch=2456416.39659,
-                        teff=6153.0, stellar_radius=1.62, J=9.159,
-                        planet_radius=1.72*zachopy.units.Rjupiter/zachopy.units.Rearth,
-                        a_over_r=7.3488, planet_mass=0.452*zachopy.units.Mjupiter/zachopy.units.Mearth,
-                        radius_ratio=0.109, b=0.17,
-                        ra=313.78308, dec=-34.135528))'''
+        self.known = pop()
 
-
-
+        # clean the names of all the transiting planets
         for k in self.known.standard:
-            k['name'] = self.clean(k['name'])
+            k['name'] = clean(k['name'])
+
+        # propagate the changed names through the population
         self.known.propagate()
 
-        # tidy up junk
-        possible = (self.known.dec < self.observatory.latitude.value + 60.0)
-        ok = (self.known.J > 0)*(self.known.a_over_r > 0)*possible*(self.known.dec*astropy.units.deg > self.observatory.latitude - 60.0*astropy.units.deg)
+        # remove planets that are impossible to see from this latitude
+        deg = astropy.units.deg
+        zenith = np.abs(self.known.dec*deg - self.observatory.latitude.value)
+        possible = zenith < 60.0*deg
+        self.speak('{}/{} targets are visible from {} latitude'.format(
+                            np.sum(possible), len(possible),
+                            self.observatory.latitude)
+
+        # get rid of junky entries
+        notjunky = (self.known.J > 0)*(self.known.a_over_r > 0)
+        ok = notjunky*possible
+        self.speak('{} otherwise visible targets were junk'.format(
+                        np.sum(possible)-np.sum(ok))
+
+        # trim the population
         self.known.standard = self.known.standard[ok]
-
         self.known.propagate()
+        self.speak('the trimmed population contains {} objects'.format(
+                        len(self.known.standard))
+
 
     def selectInteresting(self, table=None, filter=None, list=None):
+        '''specify which of the planets are interesting
+                table = a exopop style standard table
+                filter = indices or a mask, for the known table
+                list = a list of names to select
+        '''
+
 
         if table is None:
             if list is None:
@@ -70,7 +114,7 @@ class Plan(Talker):
                     filter = self.known.name == 'WASP-94A b'
                 table = self.known.standard[filter]
             else:
-                cleaned = [self.clean(l) for l in list]
+                cleaned = [clean(l) for l in list]
                 toselect = astropy.table.Table(dict(name=cleaned))
                 table = astropy.table.join(self.known.standard, toselect)
 
@@ -78,8 +122,8 @@ class Plan(Talker):
         self.interesting = Interesting(table)
         self.populatePlanets()
 
-
     def populatePlanets(self):
+        '''create a bunch of Planet objects, from the table'''
         self.planets = []
         for i in range(len(self.interesting.standard)):
             name = self.interesting.name[i]
@@ -93,12 +137,16 @@ class Plan(Talker):
                 print "UH-OH! Something went wrong on {0}".format(name)
 
     def findTransits(self):
+        '''identify all the transits for all the planets'''
+        self.speak('identifying transits among all the planets')
         for planet in self.planets:
             planet.findTransits(self.semester.start, self.semester.finish)
             planet.filterTransits()
 
 
     def printTransits(self):
+        '''print all the observable transits'''
+
         for p in self.planets:
             p.speak(p.name)
             for t in p.transits:
@@ -109,6 +157,7 @@ class Plan(Talker):
 
 
     def plotTransits(self):
+        '''plot the transits, on one massive plot'''
         self.speak('plotting transits')
         self.findTransits()
         plt.ion()
@@ -147,6 +196,8 @@ class Plan(Talker):
         plt.draw()
 
     def movie(self, fps=10, bitrate=10000, filename=None):
+        '''make a movie of the massive plot of transits'''
+
         plt.ioff()
         self.speak('making a movie of transits')
         # initialize the animator

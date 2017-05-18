@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-# stolen shamelessly by zkbt from examples in dfm's and timothydmorton's github repos
+# This layout for setup.py stolen shamelessly by zkbt
+# from examples in dfm's and timothydmorton's github repos,
+# with much gratitude to them for the help!
+
 
 import os, sys, numpy, glob
 
-
 # import setup functions
 try:
-    from setuptools import setup, Extension
+    from setuptools import setup
 except ImportError:
-    from distutils.core import setup, Extension
+    from distutils.core import setup
 
 # publish the library to PyPI.
 if "publish" in sys.argv[1:]:
@@ -32,7 +34,7 @@ setup(
     name="whatsup",
     version=whatsup.__version__,
     author="Zach Berta-Thompson",
-    author_email="zkbt@mit.edu",
+    author_email="zach.bertathompson@colorado.edu",
     packages=[
         "whatsup"
     ],
