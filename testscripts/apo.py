@@ -11,7 +11,7 @@ p.known = Confirmed()
 col = p.known.standard['name'].astype('S20')
 p.known.standard.replace_column('name', col)
 
-distance = 100
+distance = 50
 transmission = p.known.standard[p.known.distance < distance]
 for i in range(len(transmission)):
     transmission['name'][i] =  transmission['name'][i] + ' (T)'

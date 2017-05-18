@@ -81,23 +81,23 @@ class Plan(Talker):
 
         # remove planets that are impossible to see from this latitude
         deg = astropy.units.deg
-        zenith = np.abs(self.known.dec*deg - self.observatory.latitude.value)
+        zenith = np.abs(self.known.dec*deg - self.observatory.latitude)
         possible = zenith < 60.0*deg
         self.speak('{}/{} targets are visible from {} latitude'.format(
                             np.sum(possible), len(possible),
-                            self.observatory.latitude)
+                            self.observatory.latitude))
 
         # get rid of junky entries
         notjunky = (self.known.J > 0)*(self.known.a_over_r > 0)
         ok = notjunky*possible
         self.speak('{} otherwise visible targets were junk'.format(
-                        np.sum(possible)-np.sum(ok))
+                        np.sum(possible)-np.sum(ok)))
 
         # trim the population
         self.known.standard = self.known.standard[ok]
         self.known.propagate()
         self.speak('the trimmed population contains {} objects'.format(
-                        len(self.known.standard))
+                        len(self.known.standard)))
 
 
     def selectInteresting(self, table=None, filter=None, list=None):

@@ -1,6 +1,8 @@
 *.mp4
 *.png
-
+build
+dist
+*.egg-info
 
 ##############################
 # i'm not sure what these are
