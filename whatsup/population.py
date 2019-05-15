@@ -1,8 +1,9 @@
-from imports import *
+from .imports import *
+from exopop.Population import Population
+mamajek = thistothat.Mamajek()
 
-mamajek = zachopy.relations.Mamajek()
 
-class Population(Talker):
+class OldUnusedPopulation(Talker):
     def __init__(self, **kwargs):
         Talker.__init__(self, **kwargs)
         self.load()
@@ -31,7 +32,7 @@ class Population(Talker):
         return np.array([clean(name) in clean(x) for x in self.name]).nonzero()[0]
 
     def __str__(self):
-        print self.standard
+        print(self.standard)
         return ''
 
     @property
@@ -77,9 +78,14 @@ class Population(Talker):
         except:
             return self.teff/np.sqrt(2*self.a_over_r)
 
+    @property
+    def b(self):
+        return self.standard['b']
 
     @property
     def duration(self):
+
+
         return self.period/np.pi/self.a_over_r
 
     @property
@@ -92,7 +98,7 @@ class Population(Talker):
             self.planet_mass
         except:
             return 1000.0
-        g = zachopy.units.G*self.planet_mass*zachopy.units.Mearth/(self.planet_radius*zachopy.units.Rearth)**2
+        g = craftroom.units.G*self.planet_mass*craftroom.units.Mearth/(self.planet_radius*craftroom.units.Rearth)**2
         g[g <= 0] = 2000.0
         return g
 
@@ -105,7 +111,7 @@ class Population(Talker):
 
     @property
     def scaleheight(self):
-        return zachopy.units.k_B*self.teq/self.mu/zachopy.units.mp/self.surfacegravity
+        return craftroom.units.k_B*self.teq/self.mu/craftroom.units.mp/self.surfacegravity
 
     @property
     def noisepertransit(self):
@@ -138,7 +144,7 @@ class Population(Talker):
 
     @property
     def depth(self):
-        return (self.planet_radius*zachopy.units.Rearth/self.stellar_radius/zachopy.units.Rsun)**2
+        return (self.planet_radius*craftroom.units.Rearth/self.stellar_radius/craftroom.units.Rsun)**2
 
     def plot(self, xname, yname, names=True, xlog=True, ylog=True):
         plt.ion()
@@ -290,11 +296,11 @@ class Known(Population):
         s['teff'] = t['TEFF']
         s['stellar_radius'] = t['RSTAR']
         s['J'] = t['J']
-        s['planet_radius'] = t['R']*zachopy.units.Rjupiter/zachopy.units.Rearth
+        s['planet_radius'] = t['R']*craftroom.units.Rjupiter/craftroom.units.Rearth
         s['a_over_r'] = t.MaskedColumn(t['AR'], mask=t['AR']==0.0)
         #s['teq'] = 280.0*t['S/Se']**0.25
         s['rv_semiamplitude'] =  t.MaskedColumn(t['K'], mask=t['K']==0.0)
-        s['planet_mass'] = t['MASS']*zachopy.units.Mjupiter/zachopy.units.Mearth
+        s['planet_mass'] = t['MASS']*craftroom.units.Mjupiter/craftroom.units.Mearth
         s['radius_ratio'] = t['RR']
         badpos = (t['RA'] ==0.0)*(t['DEC'] == 0.0)
         s['ra'] = t.MaskedColumn(t['RA']*15.0, mask=badpos)
@@ -303,8 +309,8 @@ class Known(Population):
         self.standard = s
         '''self.standard.add_row(dict(name='WASP-94A b', period=3.9501907,             transit_epoch=2456416.39659,
                                 teff=6153.0, stellar_radius=1.62, J=9.159,
-                                planet_radius=1.72*zachopy.units.Rjupiter/zachopy.units.Rearth,
-                                a_over_r=7.3488, planet_mass=0.452*zachopy.units.Mjupiter/zachopy.units.Mearth,
+                                planet_radius=1.72*craftroom.units.Rjupiter/craftroom.units.Rearth,
+                                a_over_r=7.3488, planet_mass=0.452*craftroom.units.Mjupiter/craftroom.units.Mearth,
                                 radius_ratio=0.109, b=0.17,
                                 ra=313.78308, dec=-34.135528))'''
 
@@ -344,7 +350,7 @@ class TESS(Population):
         s['teq'] = 280.0*t['S/Se']**0.25
         s['a_over_r'] = 0.5*(s['teff']/s['teq'])**2
         s['rv_semiamplitude'] = t['RV[m/s]']
-        s['radius_ratio'] = t['Rp/Re']*zachopy.units.Rearth/(t['Rs/Rsun']*zachopy.units.Rsun)
+        s['radius_ratio'] = t['Rp/Re']*craftroom.units.Rearth/(t['Rs/Rsun']*craftroom.units.Rsun)
         s['distance'] = 10*10**(0.2*t['DM'])
         s['ra'] = t['RA/deg']
         s['dec'] = t['DEC/deg']
@@ -372,7 +378,7 @@ class KOI(Population):
 
         for i in range(len(self.table['kepler_name'])):
             if 'Kepler-444' in self.table['kepler_name'][i]:
-                print 'REPLACING!'
+                print('REPLACING!')
                 self.table['srad'][i] = 0.752
 
         fromexoorg = Known().table[['KEPID','J']].group_by('KEPID').groups.aggregate(np.mean)
@@ -404,7 +410,7 @@ class KOI(Population):
 
         ras, decs = [],[]
         for i in range(len(t)):
-            ra, dec = zachopy.strings.unclockify(t[i]['ra_str'] + ' ' + t[i]['dec_str'])
+            ra, dec = craftroom.strings.unclockify(t[i]['ra_str'] + ' ' + t[i]['dec_str'])
             ras.append(ra)
             decs.append(dec)
 

@@ -1,4 +1,4 @@
-from imports import *
+from .imports import *
 
 # create an empty dictionary
 observatories = {}
@@ -109,7 +109,7 @@ class Observatory(Talker):
 
         assert((finishes > starts).all())
         for i in range(len(starts)):
-            ax.axvspan(starts[i].plot_date, finishes[i].plot_date, color=color, zorder=100)
+            ax.axvspan(starts[i].plot_date, finishes[i].plot_date, color=color, zorder=-100)
 
     def sun(self, times):
         sunCoords = astropy.coordinates.get_sun(times)

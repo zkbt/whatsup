@@ -1,5 +1,8 @@
 *.mp4
 *.png
+*.pdf
+*.txt
+
 build
 dist
 *.egg-info

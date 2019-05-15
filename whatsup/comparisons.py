@@ -1,7 +1,7 @@
 import Population
 import matplotlib.pyplot as plt, numpy as np
 import matplotlib.animation as animation
-from zachopy.Talker import Talker
+from craftroom.Talker import Talker
 
 
 # initialize the populations
@@ -96,8 +96,8 @@ class BubblePlot(Talker):
                 try:
                     plt.text(self.x[i], self.y[i], self.pop.name[i])
                 except:
-                    print '!#!!@$!@$!@$'
-                    print self.pop.name[i]
+                    print('!#!!@$!@$!@$')
+                    print(self.pop.name[i])
 
 
         plt.draw()
@@ -286,7 +286,7 @@ class thumbtacks(BubblePlot):
         self.leg = plt.legend(bbox_to_anchor=(1, 1), fontsize=10, framealpha=0.0, scatterpoints=1, markerscale=1.5, title='Transiting Exoplanets')
 
     def highlight(self, indices, label='special!'):
-        print self.pop.standard[indices]
+        print(self.pop.standard[indices])
         kw = self.kw(self.key)
         kw['marker'] = '*'
         kw['edgecolors'] = colors[self.key].replace('black', 'gray')
@@ -303,7 +303,7 @@ class thumbtacks(BubblePlot):
         #kic = self.pop.standard['kepid'][indices]
         for i in range(len(t)):
             self.ax.text(self.x[indices][i], self.y[indices][i], r'{0:.0f}K, {1:.1f}R$_\oplus$'.format(t[i], r[i]) +'\n', size=8, ha='center', va='bottom', color=colors[self.key].replace('black', 'gray'))
-            print  r[i], t[i]#, self.pop.distance[indices][i]
+            print(r[i], t[i])#, self.pop.distance[indices][i]
         #(self.name == 'WASP-94A b').nonzero()[0]
 
     @property

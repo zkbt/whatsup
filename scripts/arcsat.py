@@ -5,13 +5,11 @@ from whatsup.imports import *
 import numpy as np
 from exopop.Confirmed import Confirmed
 
-p = plan.Plan(observatory='APO', semester='2017-Q3',  start='2016-07-01', finish='2016-09-30', maxairmass=2.5, maxsun=-6.0)
+p = plan.Plan(observatory='APO', semester='2018-Q1',  start='2017-10-01', finish='2018-08-31', maxairmass=2.5, maxsun=-6.0)
 p.known = Confirmed()
 
-col = p.known.standard['name'].astype('S20')
-p.known.standard.replace_column('name', col)
 
-distance = 50
+distance = 20
 transmission = p.known.standard[p.known.distance < distance]
 for i in range(len(transmission)):
     transmission['name'][i] =  transmission['name'][i] + ' (T)'
@@ -41,6 +39,6 @@ p.movie(filename='jayneeclipses.mp4')
 combined = transmission
 p.selectInteresting(table=combined)
 p.findTransits()
-#p.printTransits()
+p.printTransits()
 p.plotTransits()
-p.movie(filename='apo_summer.mp4')
+p.movie(filename='apo_fall.mp4')

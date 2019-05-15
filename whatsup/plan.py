@@ -1,23 +1,36 @@
-from imports import *
-from semester import Semester
-from observatory import Observatory
-from population import Interesting
+from .imports import *
+from .semester import Semester
+from .observatory import Observatory
+from .population import Interesting
 from exopop.Confirmed import Confirmed
-from planet import Planet
+from .planet import Planet
 from matplotlib import animation
 
 # a list of colors to give transits (will repeat)
 colors = [  'salmon',
+            'firebrick',
+            'hotpink',
             'mediumvioletred',
+            'coral',
+            'orangered',
             'darkorange',
             'plum',
+            'fuchsia',
             'darkviolet',
+            'purple',
             'indigo',
+            'slateblue',
+            'limegreen',
             'seagreen',
             'darkgreen',
+            'olive',
             'teal',
             'steelblue',
-            'royalblue']
+            'royalblue',
+            'sandybrown',
+            'chocolate',
+            'saddlebrown',
+            'maroon']
 
 class Plan(Talker):
     '''a Plan object to keep track of potentially observable transits'''
@@ -43,7 +56,7 @@ class Plan(Talker):
 
         # set up a directory to store results in
         self.directory = directory
-        zachopy.utils.mkdir(self.directory)
+        craftroom.utils.mkdir(self.directory)
 
         # set up our observatory
         self.observatory = Observatory(observatory, plan=self)
@@ -131,10 +144,16 @@ class Plan(Talker):
                 this_planet = Planet(self.interesting.standard[i],
                     color=colors[i % len(colors)], plan=self)
                 assert(np.isfinite(this_planet.period))
-                assert(np.isfinite(this_planet.duration))
                 self.planets.append(this_planet)
+
+                try:
+                    assert(np.isfinite(this_planet.duration))
+                except AssertionError:
+                    print(name, this_planet.duration, this_planet.a_over_r)
+
             except (ValueError,AssertionError):
-                print "UH-OH! Something went wrong on {0}".format(name)
+                print("UH-OH! Something went wrong on {0}".format(name))
+
 
     def findTransits(self):
         '''identify all the transits for all the planets'''
@@ -144,13 +163,14 @@ class Plan(Talker):
             planet.filterTransits()
 
 
-    def printTransits(self):
+    def printTransits(self, filename='upcoming_transits.txt'):
         '''print all the observable transits'''
-
-        for p in self.planets:
-            p.speak(p.name)
-            for t in p.transits:
-                t.details()
+        with open(filename, 'w') as f:
+            for p in self.planets:
+                p.speak(p.name)
+                for t in p.transits:
+                    s = t.details()
+                    f.write(s + '\n')
                 #(t.posttransit - t.pretransit).value*24))
                 #self.observatory.sun(t.pretransit).alt.deg[0],
                 #self.observatory.sun(t.posttransit).alt.deg[0]))
@@ -163,7 +183,7 @@ class Plan(Talker):
         plt.ion()
 
         # set up the plotting windows
-        self.figure = plt.figure('upcoming transits', figsize=(10, 4))
+        self.figure = plt.figure('upcoming transits', figsize=(10, 4), dpi=300)
         self.gs = plt.matplotlib.gridspec.GridSpec(2,1, hspace=0, wspace=0, height_ratios=[0.3, 1.0], bottom=0.35)
         self.ax = {}
 

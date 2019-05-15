@@ -1,7 +1,7 @@
-from imports import *
+from .imports import *
 
-from transit import Transit
-from population import Interesting
+from .transit import Transit
+from .population import Interesting
 
 class Planet(Interesting):
     def __init__(self, row, color='red', plan=None):
