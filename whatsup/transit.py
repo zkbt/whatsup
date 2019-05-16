@@ -9,7 +9,7 @@ class Transit(Talker):
         initialize:
             planet = a Planet object (which contains a period and epoch)
             i = the epoch of this transit
-            phasefrommidtransit = set this to 0.5 for eclipses from circular
+            phasefrommidtransit = set this to 0.5 for eclipses (for circular)
             plan = the Plan object in which this is embedded
         '''
 
@@ -32,11 +32,8 @@ class Transit(Talker):
     def duration(self):
         '''the duration of the transit'''
 
+        # this should be in days
         d = self.planet.duration
-        try:
-            d.unit
-        except AttributeError:
-            d = d*astropy.units.day
 
         if np.isfinite(d):
             return d
@@ -46,12 +43,12 @@ class Transit(Talker):
     @property
     def ingress(self):
         '''when is ingress?'''
-        return self.midtransit - self.duration*(0.5)
+        return self.midtransit - self.duration*0.5
 
     @property
     def egress(self):
         '''when is egress?'''
-        return self.midtransit + self.duration*(0.5 )
+        return self.midtransit + self.duration*0.5
 
     @property
     def pretransit(self):
@@ -67,12 +64,12 @@ class Transit(Talker):
     @property
     def withbuffer(self):
         '''list of plot_date times from start to finish of observation'''
-        return [self.pretransit.plot_date, self.posttransit.plot_date]
+        return [self.pretransit, self.posttransit]
 
     @property
     def justtransit(self):
         '''list of plot_date times from start to finish of transit'''
-        return [self.ingress.plot_date, self.egress.plot_date]
+        return [self.ingress, self.egress]
 
     def plot(self,  y=0, alpha=0.6, linewidth=5, marker=None, **kwargs):
         '''plot this transit within a night'''
@@ -88,36 +85,50 @@ class Transit(Talker):
         #self.plan.ax['transits'].plot(self.justtransit, vertical,  **kwargs)
         # print self.planet.name, [self.pretransit.plot_date, self.posttransit.plot_date], [y,y]
 
-        # plot the airmass
-        times = self.pretransit + np.linspace(0, (self.buffer*2 + 1), 100)*self.duration
-        altaz = self.plan.observatory.altaz(self.planet.coord, times)
+        # figure out the airmass for this transit
+        times = self.midtransit + np.linspace(-1, 1, 100)*self.duration*self.buffer
+        astropy_times = Time(times, format='jd')
+        altaz = self.plan.observatory.altaz(self.planet.coord, astropy_times)
         airmass = altaz.secz.value
         ok = altaz.alt > 0
-        assert(self.duration < 0.5*astropy.units.day)
 
+        # why is this here?
+        assert(self.duration < 0.5)
+
+        # pull out the intransit subset
         intransit = (times >= self.ingress)*(times <= self.egress)
 
+        # plot the full airmass curve
         self.plan.ax['airmass'].plot(times.plot_date[ok], airmass[ok], **kwargs)
+
+        # plot the airmass curve of just the transit
         self.plan.ax['airmass'].plot(times.plot_date[ok*intransit], airmass[ok*intransit], **kwargs)
 
-        self.plan.ax['transits'].text(self.midtransit.plot_date, y, self.planet.name, color=self.planet.color, ha='center', va='center', weight='bold', alpha=kwargs['alpha'], fontsize=5)
+        # add a label to this transit
+
+        self.plan.ax['transits'].text(Time(self.midtransit, format='jd').plot_date, y, self.planet.name, color=self.planet.color, ha='center', va='center', weight='bold', alpha=kwargs['alpha'], fontsize=5)
 
         #self.plan.ax['airmass'].set_ylim(self.plan.maxairmass, 0.9)
         self.plan.ax['airmass'].set_ylim(2.5, 0.9)
 
-    def airmass(self, t):
+    def airmass(self, time):
         '''airmass string, for a particular time'''
-        return '{0:.1f}'.format(self.observatory.altaz(self.planet.coord, t).secz.value)
+        astropy_time = Time(time, format='jd')
 
-    def sunalt(self, t):
+        return '{0:.1f}'.format(self.observatory.altaz(self.planet.coord, astropy_time).secz.value)
+
+    def sunalt(self, time):
         '''sunaltitude, for a particular time'''
-        return '{0:+3.0f}'.format(self.observatory.sun(t).alt.deg)
+        astropy_time = Time(time, format='jd')
+
+        return '{0:+3.0f}'.format(self.observatory.sun(astropy_time).alt.deg)
 
     def simpletime(self, time):
-        return '{0:.5f} = {1} UT (A={2},S={3})'.format( time.jd,
-                                                time.iso[0:16],
-                                                self.airmass(time),
-                                                self.sunalt(time))
+        astropy_time = Time(time, format='jd')
+        return '{0:.5f} = {1} UT (A={2},S={3})'.format( astropy_time.jd,
+                                                astropy_time.iso[0:16],
+                                                self.airmass(astropy_time),
+                                                self.sunalt(astropy_time))
 
     def details(self):
 

@@ -8,6 +8,9 @@ import thistothat, craftroom.strings, craftroom.units, craftroom.utils
 import numpy as np, matplotlib.pyplot as plt
 import astropy.units, astropy.time, astropy.coordinates, astropy.io.ascii, astropy.table
 
+from astropy.time import Time
+import astropy.units as u
+
 def clean(s):
     '''strip messy characters from a string'''
     new = s + ''

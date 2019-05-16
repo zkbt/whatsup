@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # set the version number for this package
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 # this is something sneaky to make this file callable from within setup.py
 #   (to determine the version number)
@@ -15,14 +15,16 @@ if not __WHATSUP_SETUP__:
 
     # these are the only things that can be called straight from this level
     __all__ = [
-        "Night", "Observatory", "Planet", "population", "Transit"
+        "Night", "Observatory", "Planet", "population", "Transit", "Semester", "Plan"
     ]
 
     # import these class definitons, so they can be called directly as like
     #   p = whatsup.Planet()
 
+    from .plan import Plan
     from .night import Night
     from .observatory import Observatory
     from .planet import Planet
     from .transit import Transit
+    from .semester import Semester
     from . import population

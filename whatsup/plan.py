@@ -36,14 +36,13 @@ class Plan(Talker):
     '''a Plan object to keep track of potentially observable transits'''
 
     def __init__(self,
-                    semester='2015B',
-                    observatory='LCO',
+                    pop=None,
+                    start=None, finish=None,
+                    observatory='SBO',
                     maxairmass=5,
                     maxsun=10.0,
-                    directory='/Users/zkbt/Dropbox/proposals/observability/',
-                    name='default',
-                    start=None,
-                    finish=None):
+                    directory='observability/',
+                    name='default'):
 
         '''initialize, setting the observatory, semester, and population'''
 
@@ -62,11 +61,13 @@ class Plan(Talker):
         self.observatory = Observatory(observatory, plan=self)
 
         # set up the time range this should cover
-        self.semester = Semester(semester, plan=self, start=start, finish=finish)
+        self.semester = Semester(start=start, finish=finish, plan=self)
 
         # load the population of planets
-        self.loadPopulation()
-        self.selectInteresting()
+        self.pop = pop or Confirmed()
+
+        # tidy up that population
+        self.tidyPopulation()
 
         # print out a summary of this plan
         self.describeInputs()
@@ -78,78 +79,57 @@ class Plan(Talker):
         self.speak('Time range spans {} to {}'.format(self.semester.start, self.semester.finish))
         self.speak('Population contains {} objects'.format(len(self.known.standard)))
 
-    def loadPopulation(self, pop=Confirmed):
+    def tidyPopulation(self):
         '''load a population of exoplanets, defaulting to the list
         of confirmed transiting planets from the NASA Exoplanet Archive'''
 
-        # set up the population
-        self.known = pop()
 
         # clean the names of all the transiting planets
-        for k in self.known.standard:
+        for k in self.population.standard:
             k['name'] = clean(k['name'])
-
-        # propagate the changed names through the population
-        self.known.propagate()
 
         # remove planets that are impossible to see from this latitude
         deg = astropy.units.deg
-        zenith = np.abs(self.known.dec*deg - self.observatory.latitude)
+        zenith = np.abs(self.population.dec*deg - self.observatory.latitude)
         possible = zenith < 60.0*deg
         self.speak('{}/{} targets are visible from {} latitude'.format(
                             np.sum(possible), len(possible),
                             self.observatory.latitude))
 
         # get rid of junky entries
-        notjunky = (self.known.J > 0)*(self.known.a_over_r > 0)
+        #notjunky = (self.population.J > 0)*(self.population.a_over_r > 0)
         ok = notjunky*possible
         self.speak('{} otherwise visible targets were junk'.format(
                         np.sum(possible)-np.sum(ok)))
 
         # trim the population
-        self.known.standard = self.known.standard[ok]
-        self.known.propagate()
+        self.population.standard = self.population.standard[possible]
+        self.population.propagate()
+
         self.speak('the trimmed population contains {} objects'.format(
                         len(self.known.standard)))
 
 
-    def selectInteresting(self, table=None, filter=None, list=None):
-        '''specify which of the planets are interesting
-                table = a exopop style standard table
-                filter = indices or a mask, for the known table
-                list = a list of names to select
-        '''
-
-
-        if table is None:
-            if list is None:
-                if filter == None:
-                    filter = self.known.name == 'WASP-94A b'
-                table = self.known.standard[filter]
-            else:
-                cleaned = [clean(l) for l in list]
-                toselect = astropy.table.Table(dict(name=cleaned))
-                table = astropy.table.join(self.known.standard, toselect)
-
-        # pull out the interesting targets
-        self.interesting = Interesting(table)
-        self.populatePlanets()
-
     def populatePlanets(self):
         '''create a bunch of Planet objects, from the table'''
         self.planets = []
-        for i in range(len(self.interesting.standard)):
-            name = self.interesting.name[i]
+        for i in range(len(self.population.standard)):
+            name = self.population.name[i]
             try:
-                this_planet = Planet(self.interesting.standard[i],
+                this_planet = Planet(self.population.standard[i],
                     color=colors[i % len(colors)], plan=self)
                 assert(np.isfinite(this_planet.period))
-                self.planets.append(this_planet)
 
                 try:
                     assert(np.isfinite(this_planet.duration))
+                    assert(np.isfinite(this_planet.transit_epoch))
+                    assert(np.isfinite(this_planet.period))
+                    self.planets.append(this_planet)
+
                 except AssertionError:
-                    print(name, this_planet.duration, this_planet.a_over_r)
+                    self.speak(f'skipping {name} because its ephemeris is messy')
+                    self.speak(f'(P={this_planet.period}, T0={this_planet.transit_epoch}, duration={this_planet.duration})')
+
 
             except (ValueError,AssertionError):
                 print("UH-OH! Something went wrong on {0}".format(name))

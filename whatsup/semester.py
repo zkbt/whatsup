@@ -8,30 +8,58 @@ class Semester(Talker):
         The start of the semester ()
 
     """
-    def __init__(self, name='2015B', start=None, finish=None, plan=None):
+    def __init__(self, start=None, finish=None, plan=None, name='thisweek'):
+        '''
+        Parameters
+        ----------
+        start : astropy.time.Time
+            The start of the time range to consider.
+            (defaults to now)
+        finish : astropy.time.Time
+            The end of the time range to consider.
+            (defaults to start + 7 days)
+        plan : Plan
+            The plan to which this semester is connected.
+        name : str
+            A descriptive name for this time range.
+        '''
+
+
+
+
+
         Talker.__init__(self)
+
+        # store the connection to the plan
         self.plan = plan
+
+
+        try:
+            assert(type(start) == Time)
+            assert(start is not None)
+        except AssertionError:
+            start = Time.now()
+
+        try:
+            assert(type(finish) == Time)
+            assert(finish is not None)
+        except AssertionError:
+            finish = start + 7*u.day
+
+        # set the start and finish times (floored down to the start of the day), as JD
+        self.start = np.floor(start.jd)
+        self.finish = np.ceil(finish.jd)
+
+        # set the noons (before the night = 0.0) and midnights to consider (0.5)
+        self.noons = np.arange(self.start, self.finish)
+        self.midnights = self.noons + 0.5
+
+        # maybe these could be gotten rid of?
+        resolution = 20/60.0/24.0
+        self.times = np.arange(self.start, self.finish, resolution)
+
+        #n = (self.finish - self.start + 2*astropy.units.day)/resolution
+        #self.start + np.arange(n)*resolution - 1*astropy.units.day
+
+
         self.name = name
-
-        if start is not None and finish is not None:
-            self.name = '{0}to{1}'.format(start, finish)
-        else:
-            if name == '2016A':
-                start='2016-01-01'
-                finish='2016-07-31'
-            if name == '2015B':
-                start='2015-07-01'
-                finish='2016-01-15'
-            if name == '2015A':
-                start='2015-06-01'
-                finish='2015-08-01'
-
-            if name == '2014B':
-                start='2014-07-01'
-                finish='2015-01-15'
-
-        self.start, self.finish = astropy.time.Time(start + ' 00:00:00.000', format='iso'), astropy.time.Time(finish + ' 00:00:00.000', format='iso')
-        self.midnights = astropy.time.Time(np.arange(self.start.jd, self.finish.jd), format='jd') + self.plan.observatory.standardzone
-        resolution = 10*astropy.units.minute
-        n = (self.finish - self.start + 2*astropy.units.day)/resolution
-        self.times = self.start + np.arange(n)*resolution - 1*astropy.units.day
