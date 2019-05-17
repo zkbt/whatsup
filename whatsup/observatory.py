@@ -1,4 +1,5 @@
 from .imports import *
+from pytz import timezone
 
 # create an empty dictionary
 observatories = {}
@@ -90,8 +91,10 @@ class Observatory(Talker):
 
         self.plan = plan
 
-    def plotSun(self, times, ax=None, threshold=-12.0, color='black'):
+    def plotSun(self, jd, ax=None, threshold=-12.0, color='black'):
         self.speak('plotting the sun')
+
+        times = Time(jd, format='jd')
         sunAltAz = self.sun(times)
 
         dt = times[1:] - times[:-1]

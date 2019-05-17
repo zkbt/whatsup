@@ -99,10 +99,10 @@ class Transit(Talker):
         intransit = (times >= self.ingress)*(times <= self.egress)
 
         # plot the full airmass curve
-        self.plan.ax['airmass'].plot(times.plot_date[ok], airmass[ok], **kwargs)
+        self.plan.ax['airmass'].plot(astropy_times.plot_date[ok], airmass[ok], **kwargs)
 
         # plot the airmass curve of just the transit
-        self.plan.ax['airmass'].plot(times.plot_date[ok*intransit], airmass[ok*intransit], **kwargs)
+        self.plan.ax['airmass'].plot(astropy_times.plot_date[ok*intransit], airmass[ok*intransit], **kwargs)
 
         # add a label to this transit
 
@@ -125,7 +125,7 @@ class Transit(Talker):
 
     def simpletime(self, time):
         astropy_time = Time(time, format='jd')
-        return '{0:.5f} = {1} UT (A={2},S={3})'.format( astropy_time.jd,
+        return '{0:.5f} = {1} UT (A={2},S={3})'.format(astropy_time.jd,
                                                 astropy_time.iso[0:16],
                                                 self.airmass(astropy_time),
                                                 self.sunalt(astropy_time))

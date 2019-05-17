@@ -5,7 +5,7 @@ from craftroom.Talker import Talker
 
 
 # initialize the populations
-pops = dict(known = Population.Known(), kepler = Population.KOI(), tess = Population.TESS())
+pops = dict(known = Population.population(), kepler = Population.KOI(), tess = Population.TESS())
 names = dict(known = 'Non-Kepler', kepler = 'Kepler', tess = 'Predicted TESS')
 colors = dict(known = 'RoyalBlue', kepler='Black', tess='OrangeRed')
 zorders = dict(known = 3, kepler=1, tess = 2)

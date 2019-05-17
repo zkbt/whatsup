@@ -5,14 +5,15 @@ from whatsup.imports import *
 def speed(p):
     p.findTransits()
     p.printTransits()
+    p.movieTransits()
     return p
 
 def test_plan():
 
     # make the population
     c = Confirmed()
-    distance = 20
-    bad = c.distance > distance
+    bad = (c.depth < 0.01) | (c.distance > 50)
+
     c.removeRows(bad)
 
     # define the population

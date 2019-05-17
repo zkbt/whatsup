@@ -1,7 +1,16 @@
 from .imports import *
-
+from exopop.Population import Population
 from .transit import Transit
-from .population import Interesting
+
+class Interesting(Population):
+    """
+    The Interesting object, for keeping track planets worth observing.
+    """
+    def __init__(self, filtered):
+        Talker.__init__(self)
+        # don't do the default Population initialization
+        self.standard = filtered
+        self.propagate()
 
 class Planet(Interesting):
     def __init__(self, row, color='red', plan=None):
@@ -90,11 +99,7 @@ class Planet(Interesting):
             altaz = self.plan.observatory.altaz(self.coord, astropy_times)
 
             # exclude transits
-            bad = (altaz.alt.deg > 0) |  (altaz.secz < self.plan.maxairmass)
-
-            # both the ingress and egress must be good
-            ok *= bad == False
-
+            ok *= (altaz.alt.deg > 0) & (altaz.secz < self.plan.maxairmass)
 
             # filter out the transits that start or end when the Sun is up
             sunaltaz = self.plan.observatory.sun(astropy_times)
@@ -109,4 +114,4 @@ class Planet(Interesting):
             t.plot(**kw)
 
     def __repr__(self):
-        return f'<{self.name}, P={self.period}d>'
+        return f'<{self.name}, P={self.period}d, T0={self.transit_epoch}>'

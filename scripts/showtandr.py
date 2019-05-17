@@ -9,9 +9,9 @@ p = plan.Plan(name='transmission+reflection',  semester='2016A')
 
 n = 100
 
-trans = p.known.transmissionsignal/p.known.noisepertransit
+trans = p.population.transmissionsignal/p.population.noisepertransit
 goodfortransmission = np.argsort(trans)[::-1]
-transmission = p.known.standard[goodfortransmission].copy()[:n]
+transmission = p.population.standard[goodfortransmission].copy()[:n]
 for k in transmission:
     k['name'] += '(T)'
 

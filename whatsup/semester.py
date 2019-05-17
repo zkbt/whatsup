@@ -55,8 +55,8 @@ class Semester(Talker):
         self.midnights = self.noons + 0.5
 
         # maybe these could be gotten rid of?
-        resolution = 20/60.0/24.0
-        self.times = np.arange(self.start, self.finish, resolution)
+        resolution = 5.0/60.0/24.0
+        self.times = np.arange(self.start-1, self.finish+2.0, resolution)
 
         #n = (self.finish - self.start + 2*astropy.units.day)/resolution
         #self.start + np.arange(n)*resolution - 1*astropy.units.day

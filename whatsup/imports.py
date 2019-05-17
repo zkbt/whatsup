@@ -11,6 +11,8 @@ import astropy.units, astropy.time, astropy.coordinates, astropy.io.ascii, astro
 from astropy.time import Time
 import astropy.units as u
 
+from tqdm import tqdm
+
 def clean(s):
     '''strip messy characters from a string'''
     new = s + ''
