@@ -203,7 +203,7 @@ class Plan(Talker):
         self.ax['airmass'].xaxis.set_major_formatter(fmt)
         f = plt.gcf()
         f.autofmt_xdate(rotation=90)
-
+        plt.tight_layout()
 
 
         self.speak('making a movie of transits')
@@ -217,13 +217,16 @@ class Plan(Talker):
         self.speak('trying to save movie to {0}'.format(filename))
         with self.writer.saving(self.figure, filename, self.figure.get_dpi()):
             # loop over exposures
-            window = 12/24.0
+            window = 7/24.0
 
-            # approximate kludge; no daylight savings
+            # approximate kludge; no daylight savings; need to incorporate time zones
             offset = self.observatory.standardzone.to('day').value
 
             for m in tqdm(self.semester.midnights):
                 xlim = self.ax['airmass'].get_xlim()
-                center = Time(m, format='jd').plot_date + offset 
+                center = Time(m, format='jd').plot_date + offset
                 self.ax['airmass'].set_xlim((center - window), (center + window))
+
+                nightof = Time(m - 0.5, format='jd').iso.split()[0]
+                self.ax['transits'].set_title('Observability from {} on {}'.format(self.observatory.name, nightof))
                 self.writer.grab_frame()

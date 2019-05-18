@@ -12,7 +12,7 @@ def test_plan():
 
     # make the population
     c = Confirmed()
-    bad = (c.depth < 0.01) | (c.distance > 50)
+    bad = (c.depth < 0.01) | (c.distance > 500)
 
     c.removeRows(bad)
 
